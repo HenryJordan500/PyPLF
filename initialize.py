@@ -1,0 +1,1 @@
+# This file initializes a space and a set of particles and visualizes it
