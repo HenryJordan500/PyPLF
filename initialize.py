@@ -10,11 +10,11 @@ class Simulation_Region():
         self.upper_boundary = upper_boundary
         self.boundary_condition = boundary_condition
 
-    # def_update bounadary
+    # def_update boundary
 
 
 
 
-# Workflow: 1. Set up left and right x boundary. 2. Set boundary conditions. 3. Se up particles using these conditions
+# Workflow: 1. Set up left and right x boundary. 2. Set boundary conditions. 3. Set up particles using these conditions
 
 # Create boundary object so that boundaries can be stored, accessed, and updated
