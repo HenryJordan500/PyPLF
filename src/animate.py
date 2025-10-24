@@ -1,0 +1,1 @@
+# This file takes the output from simulate and animates the simulation
