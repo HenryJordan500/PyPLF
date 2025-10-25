@@ -1,0 +1,44 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  run_unit_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-file: environment.yml
+          init-shell: bash
+      - run: |
+          eval "$(micromamba shell hook --shell bash)"
+          micromamba activate pyplf
+          python -m tests.unit.test_simulations
+  run_func_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-file: environment.yml
+          init-shell: bash
+      - run: |
+          eval "$(micromamba shell hook --shell bash)"
+          micromamba activate pyplf
+          bash tests/func/test_func_simulations.sh
+  run_linter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-file: environment.yml
+          init-shell: bash
+      - run: pycodestyle $(git ls-files "*.py")
+        shell: bash -l {0}
+  
+
