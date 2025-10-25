@@ -2,26 +2,33 @@
 Input: 
 - analytical nD flow U(x_i, t)
 - analytical derivatives of the flow
-Output: 
+Output:
 - Object with stored Functions that calculate the flow and its derivatives at a given point in space and time
 
 # Setting up Simulation space
-Input: 
+Input:
 - 2nD boundarys
 - 2nD boundary conditions
 Output:
 - Object that can be called to get the boundaries and conditions
 
 # Setup Particles
-Input: 
-- Number of particles 
+Input:
+- Number of particles
     - Evently Distributed
     - Randomly Distributed
 Output:
 - Numpy array of all particle positions at inital time
 
+# Setup simulation parameters object
+Input:
+- simulation time
+- simulation time step
+Output:
+
+
 # Run Simulation
-Input: 
+Input:
 - Inital Particle Positions
 - Simulation time
 - Simulation time steps
