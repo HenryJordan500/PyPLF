@@ -25,7 +25,7 @@ Input:
 - simulation time
 - simulation time step
 Output:
-
+- 
 
 # Run Simulation
 Input:
@@ -40,7 +40,7 @@ Output:
 # Visualizations
 Input:
 - h5py file
-- Simulation parameters (time step, time, simulation space)
+- Simulation parameters object
 Ouputs:
 - Animation of particles positions over time
 - Plot of Particle positoins at one time 

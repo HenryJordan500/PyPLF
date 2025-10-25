@@ -36,10 +36,10 @@ def RK4_step(SimulationParameters, SimulationFlow, particles_stats):
     k4 = diff_eq(SimulationParameters, SimulationFlow, posvosi + B[3]*k3*delt, ti + A[3]*delt,st,fr,beta,ka,kd,Grav,FullNumParts,bottom)
 
 
-def run_simulation(SimulationRegion, SimulaitonParameters, SimulationFlow, inital_particles, save_path):
+def run_simulation(SimulationRegion, SimulationParameters, SimulationFlow, inital_particles, save_path):
 
-    simulation_steps = SimulaitonParameters.steps
-    simulation_time = SimulaitonParameters.time
+    simulation_steps = SimulationParameters.steps
+    simulation_time = SimulationParameters.time
 
     left_boundary = SimulationRegion.left_boundary
     right_boundary= SimulationRegion.right_boundary
@@ -61,9 +61,9 @@ def run_simulation(SimulationRegion, SimulaitonParameters, SimulationFlow, inita
             # Implement BC
     
     fil = h5py.File(f'{save_path}.hdf5', 'w')
-    acc = fil.create_dataset("acceleration", data=particle_stats[3], dtype='float16')
-    vos = fil.create_dataset("velocity", data=vos[2], dtype='float16')
-    pos = fil.create_dataset("position", data=pos[1], dtype='float16')
+    acc = fil.create_dataset("acceleration", data=particle_stats[:,2], dtype='float16')
+    vos = fil.create_dataset("velocity", data=particle_stats[:,1], dtype='float16')
+    pos = fil.create_dataset("position", data=particle_stats[:,0], dtype='float16')
     del acc,vos,pos
     fil.close()
 
