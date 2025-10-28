@@ -1,5 +1,5 @@
-
-class Simulation_Region():
+import numpy as np
+class SimulationRegion():
     
     def __init__(self,
                  lower_boundary,
@@ -10,63 +10,65 @@ class Simulation_Region():
         self.upper_boundary = upper_boundary
         self.boundary_condition = boundary_condition    # e.g., "periodic", "reflective", "open", but use "periodic" for now
 
-    def update_boundary(self):
-        if (self.boundary_condition == "periodic"):
-            # Update boundaries for periodic conditions
-            pass
-        elif (self.boundary_condition == "reflective"):
-            # Update boundaries for reflective conditions
-            pass
-        elif (self.boundary_condition == "open"):
-            # Update boundaries for reflective conditions
-            pass
-        
-class Particle():
+    # def update_boundary(self):
+    #     if (self.boundary_condition == "periodic"):
+    #         # Update boundaries for periodic conditions
+    #         pass
+    #     elif (self.boundary_condition == "reflective"):
+    #         # Update boundaries for reflective conditions
+    #         pass
+    #     elif (self.boundary_condition == "open"):
+    #         # Update boundaries for reflective conditions
+    #         pass
 
-    def __init__(self,
-                 position,
-                 velocity):
-        
-        self.position = position
-        self.velocity = velocity
+def initalize_particles(SimulationRegion, num_particles, distribution):
 
-class Simulation_Parameters():
+    lower_boundary = SimulationRegion.lower_boundary
+    upper_boundary = SimulationRegion.upper_boundary
+    length = upper_boundary - lower_boundary
+
+    if distribution == 'uniform':
+
+        dist_between_parts = length/num_particles
+        half_dist = dist_between_parts/2
+        particle_initial_positions = np.linspace(start=lower_boundary + half_dist,
+                                                 stop=upper_boundary - half_dist,
+                                                 num=num_particles)
+
+        return  particle_initial_positions
+
+class SimulationParameters():
 
     def __init__(self,
                  num_particles,
-                 num_steps,
-                 total_time):
+                 time_step,
+                 simulation_time,
+                 beta,
+                 st):
         
         self.num_particles = num_particles
-        self.num_steps = num_steps
-        self.total_time = total_time
-        self.time_step = total_time / num_steps
-    
-    def make_time_array(self):
-        time_array = []
-        start_time = 0
-        for i in num_steps:
-            time_array.append(start_time + time_step * i)
-        return time_array
+        self.total_time = simulation_time
+        self.time_step = time_step
+        self.num_steps = simulation_time/time_step
+        self.time_array = np.linspace(0, self.simulation_time, self.num_steps)
 
-class Simulation_Flow():
+        self.beta = beta
+        self.st = st
+
+class SimulationFlow():
 
     def __init__(self,
-                 region: Simulation_Region,
-                 parameters: Simulation_Parameters):
+                 region: SimulationRegion,
+                 parameters: SimulationParameters,
+                 flow,
+                 spatial_derivative,
+                 time_derivative):
         
         self.region = region
         self.parameters = parameters
-        self.particles = self.initialize_particles()
-
-    def initialize_particles(self):
-        particles = []
-        for i in range(self.parameters.num_particles):
-            # Initialize particle positions and velocities here
-            position = self.region.lower_boundary + (self.region.upper_boundary - self.region.lower_boundary) * i / self.parameters.num_particles
-            velocity = 0  # Initial velocity can be set as needed
-            particles.append(Particle(position, velocity))
-        return particles
+        self.flow = flow
+        self.spatial_derivative = spatial_derivative
+        self.time_derivative = time_derivative
 
 # Workflow: 1. Set up left and right x boundary. 2. Set boundary conditions. 3. Set up particles using these conditions
 
