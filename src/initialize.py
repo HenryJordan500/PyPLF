@@ -29,11 +29,9 @@ def initalize_particles(SimulationRegion, num_particles, distribution):
 
     if distribution == 'uniform':
 
-        dist_between_parts = length/num_particles
-        half_dist = dist_between_parts/2
-        particle_initial_positions = np.linspace(start=lower_boundary + half_dist,
-                                                 stop=upper_boundary - half_dist,
-                                                 num=num_particles)
+        particle_initial_positions = np.linspace(start=lower_boundary,
+                                                 stop=upper_boundary,
+                                                 num=num_particles + 2)[1:-1]
 
         return  particle_initial_positions
 

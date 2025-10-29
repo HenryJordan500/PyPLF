@@ -59,7 +59,7 @@ class TestSimulationParameters(unittest.TestCase):
         time_array = np.array([0.0, 1.0])
 
         self.assertAlmostEqual(num_steps, TestClass.num_steps)
-        npt.assert_array_almost_equal(time_array, TestClass.time_array)
+        npt.assert_array_almost_equal(TestClass.time_array, time_array)
 
 
 class TestSimulationFlow(unittest.TestCase):
@@ -87,13 +87,27 @@ class TestSimulationFlow(unittest.TestCase):
         self.assertIs(time_derivative, TestClass.time_derivative)
 
 
+class TestParticleInitialization(unittest.TestCase):
+    
+    def test_inital_particle_positions(self):
+
+        lower_boundary = -1
+        upper_boundary = 1
+        boundary_condition = 'periodic'
+        SimulationRegion = initialize.SimulationRegion(lower_boundary=lower_boundary,
+                                                upper_boundary=upper_boundary,
+                                                boundary_condition=boundary_condition)
+        num_particles = 3
+        distribution = 'uniform'
+
+        expected_positions = np.array([-0.5, 0, 0.5])
+        calculated_positions = initialize.initalize_particles(SimulationRegion=SimulationRegion,
+                                                              num_particles=num_particles,
+                                                              distribution=distribution)
+
+        npt.assert_array_almost_equal(calculated_positions, expected_positions)
 
 
-
-# Test simulation flow object works
-# Test simulation space works
-# Test simulation parameters work
-# Test Particle Initialzation
 
 # Test material derivative
 # Test diff_eq
