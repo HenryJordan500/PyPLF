@@ -47,9 +47,9 @@ class SimulationParameters():
                  st):
         
         self.num_particles = num_particles
-        self.total_time = simulation_time
+        self.simulation_time = simulation_time
         self.time_step = time_step
-        self.num_steps = simulation_time/time_step
+        self.num_steps = int(simulation_time/time_step)
         self.time_array = np.linspace(0, self.simulation_time, self.num_steps)
 
         self.beta = beta
@@ -58,14 +58,10 @@ class SimulationParameters():
 class SimulationFlow():
 
     def __init__(self,
-                 region: SimulationRegion,
-                 parameters: SimulationParameters,
                  flow,
                  spatial_derivative,
                  time_derivative):
         
-        self.region = region
-        self.parameters = parameters
         self.flow = flow
         self.spatial_derivative = spatial_derivative
         self.time_derivative = time_derivative
