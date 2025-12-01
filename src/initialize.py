@@ -40,18 +40,22 @@ class SimulationParameters():
     def __init__(self,
                  num_particles,
                  time_step,
-                 simulation_time,
+                 total_simulation_time,
                  beta,
                  st):
         
         self.num_particles = num_particles
-        self.simulation_time = simulation_time
+        self.total_simulation_time = total_simulation_time
         self.time_step = time_step
-        self.num_steps = int(simulation_time/time_step)
-        self.time_array = np.linspace(0, self.simulation_time, self.num_steps)
+        self.num_steps = int(total_simulation_time/time_step)
+        self.time_array = np.linspace(0, self.total_simulation_time, self.num_steps)
 
         self.beta = beta
         self.st = st
+
+    def current_time(self, i):
+
+        return self.time_array[i]
 
 class SimulationFlow():
 

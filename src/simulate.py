@@ -1,87 +1,110 @@
-from initialize import *
+from src.initialize import *
+from src.utils import *
 
 import numpy as np
-import h5py
 
-def material_derivative(SimulationFlow, particle_stats):
+def material_derivative(SimulationFlow, i_particle_pos_vel, time):
 
-    flow = SimulationFlow.flow(particle_stats[:,0], time)
-    flow_spatial_deriv = SimulationFlow.flow_spaital_deriv(particle_stats[:,0], time)
-    flow_time_deriv = SimulationFlow.flow_time_deriv(particle_stats[:,0], time)
+    position = i_particle_pos_vel[:, 0]
 
-    inner_product = np.sum(flow*flow_spatial_deriv)
+    flow = SimulationFlow.flow(position, time)
+    flow_spatial_deriv = SimulationFlow.spatial_derivative(position, time)
+    flow_time_deriv = SimulationFlow.time_derivative(position, time)
+
+    # Take the inner product of the flow and it's spatial derivative
+    inner_product = flow * flow_spatial_deriv
 
     return flow_time_deriv + inner_product
 
-def diff_eq(SimulationParameters, SimulationFlow, particle_stats):
+def diff_eq(SimulationParameters, SimulationFlow, i_particle_pos_vel, time):
 
-    position = particle_stats[:,0]
-    velocity = particle_stats[:,1]
-    accceleration = particle_stats[:,2]
+    position = i_particle_pos_vel[:,0]
+    velocity = i_particle_pos_vel[:,1]
+
+    result = np.zeros((SimulationParameters.num_particles, 2), dtype='float32')
 
     st = SimulationParameters.st
     beta = SimulationParameters.beta
 
-    return beta*material_derivative + (1/st) * (SimulationFlow.flow(position, time) - velocity)
+    material_derivative_result = material_derivative(SimulationFlow=SimulationFlow,
+                                                     i_particle_pos_vel=i_particle_pos_vel,
+                                                     time=time)
+    
+    # Compute result of coupled 1st order ODEs
+    result[:,0] = velocity
+    result[:,1] = beta*material_derivative_result + (1/st) * (SimulationFlow.flow(position, time) - velocity)
 
-def RK4_step(SimulationParameters, SimulationFlow, particles_stats):
+    return result
 
+def RK4_step(SimulationParameters, SimulationFlow, i_particle_pos_vel, time):
+
+    # Coefficents for 4th order Runge-Kutta Method
     A = np.array([0,1/2,1/2,1])
     CH = np.array([1/6,1/3,1/3,1/6])
     B = np.array([0,1/2,1/2,1])
 
-    k1 = diff_eq(SimulationParameters, SimulationFlow, posvosi, ti + A[0]*delt,st,fr,beta,ka,kd,Grav,FullNumParts,bottom)
-    k2 = diff_eq(SimulationParameters, SimulationFlow,posvosi + B[1]*k1*delt, ti + A[1]*delt,st,fr,beta,ka,kd,Grav,FullNumParts,bottom)
-    k3 = diff_eq(SimulationParameters, SimulationFlow,posvosi + B[2]*k2*delt, ti + A[2]*delt,st,fr,beta,ka,kd,Grav,FullNumParts,bottom)
-    k4 = diff_eq(SimulationParameters, SimulationFlow, posvosi + B[3]*k3*delt, ti + A[3]*delt,st,fr,beta,ka,kd,Grav,FullNumParts,bottom)
+    time_step = SimulationParameters.time_step
+
+    # Compute terms in 4th order Runge-Kutta Method
+    k1 = diff_eq(SimulationParameters, SimulationFlow, i_particle_pos_vel, time + A[0] * time_step)
+    k2 = diff_eq(SimulationParameters, SimulationFlow, i_particle_pos_vel + B[1] * k1 * time_step, time + A[1] * time_step)
+    k3 = diff_eq(SimulationParameters, SimulationFlow, i_particle_pos_vel + B[2] * k2 * time_step, time + A[2] * time_step)
+    k4 = diff_eq(SimulationParameters, SimulationFlow, i_particle_pos_vel + B[3] * k3 * time_step, time + A[3] * time_step)
+
+    # Calculate updated position and velocity
+    result = i_particle_pos_vel + (CH[0] * k1 + CH[1] * k2 + CH[2] * k3 + CH[3] * k4) * time_step
+
+    return result
 
 
-def run_simulation(SimulationRegion, SimulationParameters, SimulationFlow, inital_particles, save_path):
+def run_simulation(SimulationRegion, SimulationParameters, SimulationFlow, initial_particles, save_path):
 
-    simulation_steps = SimulationParameters.steps
-    simulation_time = SimulationParameters.time
+    dim_number = 1
 
-    left_boundary = SimulationRegion.left_boundary
-    right_boundary= SimulationRegion.right_boundary
+    # Extract parameters from classes
+    num_steps = SimulationParameters.num_steps
 
-    st = SimulationParameters.st
-    beta = SimulationParameters.beta
-
-    particle_stats = np.zeros((inital_particles.size, simulation_steps, 3), dtype='float32')
-    particle_stats[:,0][:,0] = inital_particles
-
-    for i in range(simulation_steps):
-
-        particle_stats[:,i][:,2] = diff_eq()
-
-        if i < simulation_steps - 1:
-            
-            particle_stats[:,i+1][0:2] = RK_step()
-
-            # Implement BC
+    # Create particle tracking arrays
+    particle_acc, particle_pos_vel = generate_tracking_arrays(initial_particles=initial_particles,
+                                                              simulation_steps=num_steps,
+                                                              dim_number=dim_number)
     
-    fil = h5py.File(f'{save_path}.hdf5', 'w')
-    acc = fil.create_dataset("acceleration", data=particle_stats[:,2], dtype='float16')
-    vos = fil.create_dataset("velocity", data=particle_stats[:,1], dtype='float16')
-    pos = fil.create_dataset("position", data=particle_stats[:,0], dtype='float16')
-    del acc,vos,pos
-    fil.close()
+    # Set function to do boundary condition checks
+    if SimulationRegion.boundary_condition == 'open':
 
+        boundary_condition_function = open_bc
 
+    # Solve the ODE with proper boundary conditions
+    for i in range(num_steps):
 
+        # Extract time for current step
+        time = SimulationParameters.current_time(i)
+        i_particle_pos_vel = particle_pos_vel[:, i]
 
+        # Compute particle acceleration for current time step
+        particle_acc[:,i][:,0] = diff_eq(SimulationParameters=SimulationParameters,
+                                         SimulationFlow=SimulationFlow,
+                                         i_particle_pos_vel=i_particle_pos_vel,
+                                         time=time)[:,1]
+        
+        if i < num_steps - 1:
+            
+            # Compute particle position and velocity at next time step
+            particle_pos_vel[:, i+1] = RK4_step(SimulationParameters=SimulationParameters,
+                                                SimulationFlow=SimulationFlow,
+                                                i_particle_pos_vel=i_particle_pos_vel,
+                                                time=time)
+            
+            # Apply boundary condition
+            particle_pos_vel[:, i+1] = boundary_condition_function(i1_particle_pos_vel=particle_pos_vel[:, i+1])
+                
+        else:
 
-
-# RK4 step function
-
-# ODE solver function
-
-# Function to compute Du/Dt
-# Subfunctions
-
-# Function to compute Vorticity
-# Subfunctions
-
-# Function to compute u-xdot
-
-# Function to save data as .h5py
+            break
+    
+    save_data(particle_acc=particle_acc,
+              particle_pos_vel=particle_pos_vel,
+              save_path=save_path)
+    
+    return
+    
