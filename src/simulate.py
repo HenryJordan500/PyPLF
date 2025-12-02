@@ -85,9 +85,9 @@ def run_simulation(SimulationRegion, SimulationParameters, SimulationFlow, initi
         
         # Compute particle acceleration for current time step
         particle_acc[:, i][:, 0:dim_number] = diff_eq(SimulationParameters=SimulationParameters,
-                                         SimulationFlow=SimulationFlow,
-                                         i_particle_pos_vel=i_particle_pos_vel,
-                                         time=time)[:, dim_number:2*dim_number]
+                                                      SimulationFlow=SimulationFlow,
+                                                      i_particle_pos_vel=i_particle_pos_vel,
+                                                      time=time)[:, dim_number:2*dim_number]
         
         if i < num_steps - 1:
             
