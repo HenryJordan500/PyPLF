@@ -74,13 +74,7 @@ def run_simulation(SimulationRegion, SimulationParameters, SimulationFlow, initi
                                                               dim_number=dim_number)
     
     # Set function to do boundary condition checks
-    if SimulationRegion.boundary_conditions[0] == 'open':
-
-        boundary_condition_function = open_bc
-
-    if SimulationRegion.boundary_conditions[0] == 'periodic':
-
-        boundary_condition_function = periodic_bc
+    
 
     # Solve the ODE with proper boundary conditions
     for i in range(num_steps):
@@ -104,7 +98,19 @@ def run_simulation(SimulationRegion, SimulationParameters, SimulationFlow, initi
                                                 time=time)
             
             # Apply boundary condition
-            particle_pos_vel[:, i+1] = boundary_condition_function(i1_particle_pos_vel=particle_pos_vel[:, i+1])
+            for k in range(len(SimulationRegion.boundary_conditions)):
+
+                if SimulationRegion.boundary_conditions[k] == 'open':
+
+                    boundary_condition_function = open_bc
+
+                if SimulationRegion.boundary_conditions[k] == 'periodic':
+
+                    boundary_condition_function = periodic_bc
+
+                particle_pos_vel[:, i+1] = boundary_condition_function(SimulationRegion=SimulationRegion,
+                                                                       i1_particle_pos_vel=particle_pos_vel[:, i+1], 
+                                                                       k=k)
                 
         else:
 
@@ -112,6 +118,7 @@ def run_simulation(SimulationRegion, SimulationParameters, SimulationFlow, initi
     
     save_data(particle_acc=particle_acc,
               particle_pos_vel=particle_pos_vel,
+              dim_number=dim_number,
               save_path=save_path)
     
     return

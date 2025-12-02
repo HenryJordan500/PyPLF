@@ -248,11 +248,13 @@ class TestSaveData(unittest.TestCase):
         acc_test = np.zeros((2, 3, 1))
         pos_vel_test = np.zeros((2, 3, 2))
         pos_vel_test[:, :, 1] = 1
+        dim_number = 1
 
         save_path = 'tests/resources/extraction_test'
 
         utils.save_data(particle_acc=acc_test,
                         particle_pos_vel=pos_vel_test,
+                        dim_number=dim_number,
                         save_path=save_path)
         
         acc = utils.extract_data(save_path=save_path,
