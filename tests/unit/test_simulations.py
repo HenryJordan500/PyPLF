@@ -593,7 +593,9 @@ class TestBoundaryConditions(unittest.TestCase):
 
         i1_particle_pos_vel = np.zeros((2,1,2))
 
-        ans = bc.open_bc(i1_particle_pos_vel=i1_particle_pos_vel)
+        ans = bc.open_bc(SimulationRegion=ex.SimFlowClass1d,
+                         i1_particle_pos_vel=i1_particle_pos_vel,
+                         k=0)
 
         npt.assert_allclose(i1_particle_pos_vel, ans)
     
@@ -614,7 +616,8 @@ class TestBoundaryConditions(unittest.TestCase):
         i1_particle_pos_vel[2] = -0.5
 
         i1_particle_pos_vel = bc.periodic_bc(SimulationRegion=TestClass,
-                                             i1_particle_pos_vel=i1_particle_pos_vel)
+                                             i1_particle_pos_vel=i1_particle_pos_vel,
+                                             k=0)
         
         expected_ans = np.array([[0.5],
                                  [0.5],
