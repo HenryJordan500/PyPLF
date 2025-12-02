@@ -42,7 +42,7 @@ def make_animation(save_path, SimulationRegion, SimulationParameters, fps=30):
     ax.set_xlabel(f'X')
     ax.set_ylabel(f'Y')
 
-    dot = ax.plot(positions[:, 0][:, 0], positions[:, 0][:, 1],'r.', markersize=4*width/8)[0]
+    dot = ax.plot(positions[:, 0][:, 0], positions[:, 0][:, 1],'r.', markersize=4*width/4)[0]
     tit = ax.set_title(f'Particles in linear flow at t = {t[0]:.3f}, $st$ = {st} , $\\beta$ = {beta}', fontsize=12*width/8)
 
     def frame(i):
