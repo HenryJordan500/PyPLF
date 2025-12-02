@@ -1,27 +1,32 @@
 from src.initialize import *
 from src.utils import *
+from src.boundary_conditions import *
 
 import numpy as np
 
 def material_derivative(SimulationFlow, i_particle_pos_vel, time):
 
-    position = i_particle_pos_vel[:, 0]
+    dim_number = SimulationFlow.dim_number
+
+    position = i_particle_pos_vel[:, 0:dim_number]
 
     flow = SimulationFlow.flow(position, time)
-    flow_spatial_deriv = SimulationFlow.spatial_derivative(position, time)
+    jacobian = SimulationFlow.jacobian(position, time)
     flow_time_deriv = SimulationFlow.time_derivative(position, time)
 
     # Take the inner product of the flow and it's spatial derivative
-    inner_product = flow * flow_spatial_deriv
+    inner_product = np.einsum('nij,nj->ni', jacobian, flow)
 
     return flow_time_deriv + inner_product
 
 def diff_eq(SimulationParameters, SimulationFlow, i_particle_pos_vel, time):
 
-    position = i_particle_pos_vel[:,0]
-    velocity = i_particle_pos_vel[:,1]
+    dim_number = SimulationFlow.dim_number
 
-    result = np.zeros((SimulationParameters.num_particles, 2), dtype='float32')
+    position = i_particle_pos_vel[:, 0:dim_number]
+    velocity = i_particle_pos_vel[:, dim_number:2*dim_number]
+
+    result = np.zeros((SimulationParameters.num_particles, 2*dim_number), dtype='float32')
 
     st = SimulationParameters.st
     beta = SimulationParameters.beta
@@ -31,8 +36,8 @@ def diff_eq(SimulationParameters, SimulationFlow, i_particle_pos_vel, time):
                                                      time=time)
     
     # Compute result of coupled 1st order ODEs
-    result[:,0] = velocity
-    result[:,1] = beta*material_derivative_result + (1/st) * (SimulationFlow.flow(position, time) - velocity)
+    result[:, 0:dim_number] = velocity
+    result[:, dim_number:2*dim_number] = beta*material_derivative_result + (1/st) * (SimulationFlow.flow(position, time) - velocity)
 
     return result
 
@@ -59,10 +64,9 @@ def RK4_step(SimulationParameters, SimulationFlow, i_particle_pos_vel, time):
 
 def run_simulation(SimulationRegion, SimulationParameters, SimulationFlow, initial_particles, save_path):
 
-    dim_number = 1
-
     # Extract parameters from classes
     num_steps = SimulationParameters.num_steps
+    dim_number = SimulationRegion.dim_number
 
     # Create particle tracking arrays
     particle_acc, particle_pos_vel = generate_tracking_arrays(initial_particles=initial_particles,
@@ -70,9 +74,13 @@ def run_simulation(SimulationRegion, SimulationParameters, SimulationFlow, initi
                                                               dim_number=dim_number)
     
     # Set function to do boundary condition checks
-    if SimulationRegion.boundary_condition == 'open':
+    if SimulationRegion.boundary_conditions[0] == 'open':
 
         boundary_condition_function = open_bc
+
+    if SimulationRegion.boundary_conditions[0] == 'periodic':
+
+        boundary_condition_function = periodic_bc
 
     # Solve the ODE with proper boundary conditions
     for i in range(num_steps):
@@ -80,12 +88,12 @@ def run_simulation(SimulationRegion, SimulationParameters, SimulationFlow, initi
         # Extract time for current step
         time = SimulationParameters.current_time(i)
         i_particle_pos_vel = particle_pos_vel[:, i]
-
+        
         # Compute particle acceleration for current time step
-        particle_acc[:,i][:,0] = diff_eq(SimulationParameters=SimulationParameters,
+        particle_acc[:, i][:, 0:dim_number] = diff_eq(SimulationParameters=SimulationParameters,
                                          SimulationFlow=SimulationFlow,
                                          i_particle_pos_vel=i_particle_pos_vel,
-                                         time=time)[:,1]
+                                         time=time)[:, dim_number:2*dim_number]
         
         if i < num_steps - 1:
             
