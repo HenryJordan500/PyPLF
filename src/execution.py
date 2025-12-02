@@ -1,5 +1,6 @@
 from src.initialize import *
 from src.simulate import *
+from src.animate import *
 
 
 import argparse
@@ -38,23 +39,30 @@ flow_list = config['flow']
 dim_number, flow, jacobian, time_derivative = create_flow_functions(flow_list=flow_list)
 
 
-RealSimulationRegion = SimulationRegion(dim_number=dim_number,
-                                        lower_boundary=lower_boundary,
-                                        upper_boundary=upper_boundary,
-                                        boundary_condition=boundary_condition)
-RealSimulationFlow = SimulationFlow(dim_number=dim_number,
+RunSimulationRegion = SimulationRegion(dim_number=dim_number,
+                                        lower_boundaries=lower_boundary,
+                                        upper_boundaries=upper_boundary,
+                                        boundary_conditions=boundary_condition)
+RunSimulationFlow = SimulationFlow(dim_number=dim_number,
                                     flow=flow,
                                     jacobian=jacobian,
                                     time_derivative=time_derivative)
-RealSimulationParameters = SimulationParameters(dim_number=dim_number,
+RunSimulationParameters = SimulationParameters(dim_number=dim_number,
                                                 num_particles=num_particles,
                                                 time_step=time_step,
                                                 total_simulation_time=total_simulation_time,
                                                 beta=beta,
                                                 st=st)
+run_initial_particles = initalize_particles(SimulationRegion=RunSimulationRegion,
+                                           SimulationParameters=RunSimulationParameters,
+                                           distribution='uniform')
 
-run_simulation(SimulationRegion=RealSimulationRegion,
-               SimulationParameters=RealSimulationParameters,
-               SimulationFlow=RealSimulationFlow,
-               initial_particles=real_initial_particles,
+run_simulation(SimulationRegion=RunSimulationRegion,
+               SimulationParameters=RunSimulationParameters,
+               SimulationFlow=RunSimulationFlow,
+               initial_particles=run_initial_particles,
                save_path=save_path)
+
+make_animation(save_path=save_path,
+               SimulationRegion=RunSimulationRegion,
+               SimulationParameters=RunSimulationParameters)

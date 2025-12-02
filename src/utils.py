@@ -84,12 +84,12 @@ def generate_tracking_arrays(initial_particles, simulation_steps, dim_number):
     
     return particle_acc, particle_pos_vel
 
-def save_data(particle_acc, particle_pos_vel, save_path):
+def save_data(particle_acc, particle_pos_vel, dim_number, save_path):
 
     fil = h5py.File(f'{save_path}.hdf5', 'w')
     acc = fil.create_dataset("acceleration", data=particle_acc, dtype='float16')
-    vel = fil.create_dataset("velocity", data=particle_pos_vel[:, :, 1:2], dtype='float16')
-    pos = fil.create_dataset("position", data=particle_pos_vel[:, :, 0:1], dtype='float16')
+    vel = fil.create_dataset("velocity", data=particle_pos_vel[:, :, dim_number:2*dim_number], dtype='float16')
+    pos = fil.create_dataset("position", data=particle_pos_vel[:, :, 0:dim_number], dtype='float16')
     del acc, vel, pos
     fil.close()
 

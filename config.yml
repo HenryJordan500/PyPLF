@@ -1,0 +1,19 @@
+save_path: runs/test
+
+# Enter components of the flow
+flow: [0.1, 0]
+
+
+# Enter the boundary conditions for each coordinate as a python list
+lower_boundaries: [0, 0]
+upper_boundaries: [1, 1]
+boundary_conditions: ['periodic', 'open']
+
+# Enter simulation parameters
+num_particles: 200
+time_step: 0.05
+total_simulation_time: 10
+
+# Enter dimensionless system parameters
+st: 10
+beta: 1
