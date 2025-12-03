@@ -1,10 +1,32 @@
+"""
+Create 2-D animations of particle trajectories using saved simulation data.
+"""
+
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
 from src.utils import *
 
 def make_animation(save_path, SimulationRegion, SimulationParameters, fps=30):
-    
+    """
+    Generate and save an MP4 animation of particle motion.
+
+    Parameters
+    ----------
+    save_path : str
+        Base file path (no extension) for loading data and saving animation.
+    SimulationRegion : SimulationRegion
+        Provides spatial boundaries for plotting.
+    SimulationParameters : SimulationParameters
+        Contains total simulation time, timestep, and dimensionless parameters.
+    fps : int, optional
+        Frames per second in the output video (default 30).
+
+    Notes
+    -----
+    This function assumes 2-D simulations for visualization.
+    """
+
     st = SimulationParameters.st
     beta = SimulationParameters.beta
     positions = extract_data(save_path=save_path,
