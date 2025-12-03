@@ -1,6 +1,30 @@
+"""
+Initialization tools for simulation domains, flow definitions, simulation
+parameters, and particle initial conditions.
+"""
+
 import numpy as np
 class SimulationRegion():
-    
+    """
+    Represents the spatial domain in which particles move.
+
+    Parameters
+    ----------
+    dim_number : int
+        Number of spatial dimensions.
+    lower_boundaries : list[float]
+        Lower domain boundary for each dimension.
+    upper_boundaries : list[float]
+        Upper domain boundary for each dimension.
+    boundary_conditions : list[str]
+        Boundary condition per dimension ('periodic' or 'open').
+
+    Raises
+    ------
+    ValueError
+        If any list does not match `dim_number` in length.
+    """
+
     def __init__(self,
                  dim_number,
                  lower_boundaries,
@@ -25,6 +49,21 @@ class SimulationRegion():
             raise ValueError('Ensure number of dimensions is the same as number of provided boundary conditions')
 
 def initalize_particles(SimulationRegion, SimulationParameters, distribution):
+    """
+    Generate initial particle positions using a specified distribution.
+
+    Parameters
+    ----------
+    SimulationRegion : SimulationRegion
+    SimulationParameters : SimulationParameters
+    distribution : str
+        Currently only 'uniform' is supported.
+
+    Returns
+    -------
+    ndarray
+        Array of shape (num_particles, dim_number) containing initial positions.
+    """
 
     lower_boundaries = SimulationRegion.lower_boundaries
     upper_boundaries = SimulationRegion.upper_boundaries
@@ -96,6 +135,26 @@ def initalize_particles(SimulationRegion, SimulationParameters, distribution):
         
 
 class SimulationParameters():
+    """
+    Stores global simulation parameters and constructs time arrays.
+
+    Parameters
+    ----------
+    dim_number : int
+    num_particles : int
+    time_step : float
+    total_simulation_time : float
+    beta : float
+    st : float
+        Dimensionless parameters from the particle equation of motion.
+
+    Attributes
+    ----------
+    num_steps : int
+        Total number of simulation steps.
+    time_array : ndarray
+        Array of time values for each step.
+    """
 
     def __init__(self,
                  dim_number,
@@ -120,6 +179,20 @@ class SimulationParameters():
         return self.time_array[i]
 
 class SimulationFlow():
+    """
+    Container for flow-related functions.
+
+    Parameters
+    ----------
+    dim_number : int
+        Spatial dimension.
+    flow : callable
+        Flow field function F(x, t).
+    jacobian : callable
+        Spatial derivative dF/dx.
+    time_derivative : callable
+        Time derivative dF/dt.
+    """
 
     def __init__(self,
                  dim_number,

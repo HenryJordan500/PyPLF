@@ -1,3 +1,13 @@
+"""
+Numerical integration routines for particle motion.
+
+Includes functions for:
+- computing material derivatives
+- evaluating the particle ODE
+- performing RK4 integration
+- running the full simulation loop
+"""
+
 from src.initialize import *
 from src.utils import *
 from src.boundary_conditions import *
@@ -5,6 +15,21 @@ from src.boundary_conditions import *
 import numpy as np
 
 def material_derivative(SimulationFlow, i_particle_pos_vel, time):
+    """
+    Compute the material derivative of the flow field at particle positions.
+
+    Parameters
+    ----------
+    SimulationFlow : SimulationFlow
+    i_particle_pos_vel : ndarray, shape (N, 2*dim)
+        Position/velocity slice at current time.
+    time : float
+
+    Returns
+    -------
+    ndarray, shape (N, dim)
+        Material derivative D(u)/Dt.
+    """
 
     dim_number = SimulationFlow.dim_number
 
@@ -20,6 +45,21 @@ def material_derivative(SimulationFlow, i_particle_pos_vel, time):
     return flow_time_deriv + inner_product
 
 def diff_eq(SimulationParameters, SimulationFlow, i_particle_pos_vel, time):
+    """
+    Compute the coupled first-order ODE system for particle motion.
+
+    Parameters
+    ----------
+    SimulationParameters : SimulationParameters
+    SimulationFlow : SimulationFlow
+    i_particle_pos_vel : ndarray
+    time : float
+
+    Returns
+    -------
+    ndarray, shape (N, 2*dim)
+        Concatenated position and velocity derivatives.
+    """
 
     dim_number = SimulationFlow.dim_number
 
@@ -42,6 +82,14 @@ def diff_eq(SimulationParameters, SimulationFlow, i_particle_pos_vel, time):
     return result
 
 def RK4_step(SimulationParameters, SimulationFlow, i_particle_pos_vel, time):
+    """
+    Advance particle positions and velocities using one RK4 step.
+
+    Returns
+    -------
+    ndarray
+        Updated position/velocity array.
+    """
 
     # Coefficents for 4th order Runge-Kutta Method
     A = np.array([0,1/2,1/2,1])
@@ -63,6 +111,23 @@ def RK4_step(SimulationParameters, SimulationFlow, i_particle_pos_vel, time):
 
 
 def run_simulation(SimulationRegion, SimulationParameters, SimulationFlow, initial_particles, save_path):
+    """
+    Run the full particle simulation and save output.
+
+    This performs:
+    - allocation of tracking arrays
+    - RK4 integration across all time steps
+    - application of boundary conditions
+    - saving acceleration, velocity, and position to disk
+
+    Parameters
+    ----------
+    SimulationRegion : SimulationRegion
+    SimulationParameters : SimulationParameters
+    SimulationFlow : SimulationFlow
+    initial_particles : ndarray
+    save_path : str
+    """
 
     # Extract parameters from classes
     num_steps = SimulationParameters.num_steps
