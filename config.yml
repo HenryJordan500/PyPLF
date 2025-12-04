@@ -2,7 +2,7 @@ save_path: runs/test
 
 # Enter components of the flow
 flow: [0.1, 0]
-$ flow: [x**2, y**2, z**2]
+# flow: [x**2, y**2, z**2]
 
 # Enter the boundary conditions for each coordinate as a python list
 lower_boundaries: [0, 0]
