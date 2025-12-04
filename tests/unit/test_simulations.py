@@ -130,6 +130,44 @@ class TestSimulationParameters(unittest.TestCase):
 
         self.assertAlmostEqual(expected_ans, ans)
 
+    def test_raises_st(self):
+
+        dim_number = 1
+        num_particles = 10
+        time_step = 0.5
+        total_simulation_time = 1
+        beta = 1
+        st = -1
+
+        self.assertRaises(
+            ValueError,
+            initialize.SimulationParameters,
+            dim_number=dim_number,
+            num_particles=num_particles,
+            time_step=time_step,
+            total_simulation_time=total_simulation_time,
+            beta=beta,
+            st=st)
+
+    def test_raises_beta(self):
+
+        dim_number = 1
+        num_particles = 10
+        time_step = 0.5
+        total_simulation_time = 1
+        beta = 4
+        st = 1
+
+        self.assertRaises(
+            ValueError,
+            initialize.SimulationParameters,
+            dim_number=dim_number,
+            num_particles=num_particles,
+            time_step=time_step,
+            total_simulation_time=total_simulation_time,
+            beta=beta,
+            st=st)
+
 
 class TestSimulationFlow(unittest.TestCase):
 
