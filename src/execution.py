@@ -1,9 +1,11 @@
 """
 Command-line execution script for running a complete PyPLF simulation.
 
-This module reads simulation settings from a YAML configuration file, constructs
-the simulation objects (region, parameters, flow, and initial particles), runs
-the particle simulation, and generates an animation of particle trajectories.
+This module reads simulation settings from a YAML configuration file,
+constructs the simulation objects
+(region, parameters, flow, and initial particles),
+runs the particle simulation,
+and generates an animation of particle trajectories.
 
 Typical usage
 -------------
@@ -14,9 +16,11 @@ Run from the command line:
 Expected configuration fields
 -----------------------------
 save_path : str
-    Base filename (without extension) for saving HDF5 data and the MP4 animation.
+    Base filename (without extension) for saving HDF5 data
+    and the MP4 animation.
 flow : list[str]
-    SymPy-compatible expressions defining each component of the flow field.
+    SymPy-compatible expressions defining
+    each component of the flow field.
 lower_boundaries : list[float]
 upper_boundaries : list[float]
     Domain boundaries for each spatial dimension.
@@ -44,8 +48,9 @@ import yaml
 # This section reads the `--config` argument pointing to a YAML configuration
 # file that contains all simulation parameters.
 
-parser = argparse.ArgumentParser(description='Execute code to conduct simulation',
-                                 prog='Conduct simulation')
+parser = argparse.ArgumentParser(
+    description='Execute code to conduct simulation',
+    prog='Conduct simulation')
 
 parser.add_argument('--config',
                     type=str,
@@ -87,41 +92,48 @@ upper_boundary = config['upper_boundaries']
 boundary_condition = config['boundary_conditions']
 
 flow_list = config['flow']
-dim_number, flow, jacobian, time_derivative = create_flow_functions(flow_list=flow_list)
+dim_number, flow, jacobian, time_derivative = create_flow_functions(
+    flow_list=flow_list)
 
 # Step 4: Execute the simulation
 # ------------------------------
 # Runs the full RK4 particle integration loop and saves acceleration,
 # velocity, and position data to an HDF5 file at <save_path>.hdf5.
 
-RunSimulationRegion = SimulationRegion(dim_number=dim_number,
-                                       lower_boundaries=lower_boundary,
-                                       upper_boundaries=upper_boundary,
-                                       boundary_conditions=boundary_condition)
-RunSimulationFlow = SimulationFlow(dim_number=dim_number,
-                                   flow=flow,
-                                   jacobian=jacobian,
-                                   time_derivative=time_derivative)
-RunSimulationParameters = SimulationParameters(dim_number=dim_number,
-                                               num_particles=num_particles,
-                                               time_step=time_step,
-                                               total_simulation_time=total_simulation_time,
-                                               beta=beta,
-                                               st=st)
-run_initial_particles = initalize_particles(SimulationRegion=RunSimulationRegion,
-                                           SimulationParameters=RunSimulationParameters,
-                                           distribution='uniform')
+RunSimulationRegion = SimulationRegion(
+    dim_number=dim_number,
+    lower_boundaries=lower_boundary,
+    upper_boundaries=upper_boundary,
+    boundary_conditions=boundary_condition)
+RunSimulationFlow = SimulationFlow(
+    dim_number=dim_number,
+    flow=flow,
+    jacobian=jacobian,
+    time_derivative=time_derivative)
+RunSimulationParameters = SimulationParameters(
+    dim_number=dim_number,
+    num_particles=num_particles,
+    time_step=time_step,
+    total_simulation_time=total_simulation_time,
+    beta=beta,
+    st=st)
+run_initial_particles = initalize_particles(
+    SimulationRegion=RunSimulationRegion,
+    SimulationParameters=RunSimulationParameters,
+    distribution='uniform')
 
-run_simulation(SimulationRegion=RunSimulationRegion,
-               SimulationParameters=RunSimulationParameters,
-               SimulationFlow=RunSimulationFlow,
-               initial_particles=run_initial_particles,
-               save_path=save_path)
+run_simulation(
+    SimulationRegion=RunSimulationRegion,
+    SimulationParameters=RunSimulationParameters,
+    SimulationFlow=RunSimulationFlow,
+    initial_particles=run_initial_particles,
+    save_path=save_path)
 
 # Step 5: Generate animation
 # --------------------------
 # Creates an MP4 animation of particle trajectories using the saved data.
 
-make_animation(save_path=save_path,
-               SimulationRegion=RunSimulationRegion,
-               SimulationParameters=RunSimulationParameters)
+make_animation(
+    save_path=save_path,
+    SimulationRegion=RunSimulationRegion,
+    SimulationParameters=RunSimulationParameters)

@@ -1,14 +1,24 @@
 """
-PyPLF (Python Particle‑Laden‑Flow) package.
+PyPLF (Python Particle-Laden Flow).
 
-This package provides tools for simulating the motion of inertial particles in prescribed flows.
-Key submodules include:
-- initialize – classes for simulation regions, flow definitions and parameters, and particle initialization.
-- simulate   – numerical integration of particle trajectories using a Runge–Kutta 4th‑order solver.
-- boundary_conditions – functions implementing periodic/open boundary conditions.
-- utils      – utilities for creating flow functions, generating tracking arrays, and saving/extracting data.
-- animate    – functions for creating animations from saved simulation data.
-- execution  – command‑line interface for running a simulation from a YAML configuration file.
+This package provides tools for simulating inertial particle trajectories
+in prescribed fluid flows.
 
-Users typically import from submodules rather than from the package root.
+Submodules
+----------
+initialize
+    Simulation domain, flow, and parameter setup.
+simulate
+    Numerical integrator (RK4) and ODE definitions.
+boundary_conditions
+    Periodic and open boundary condition implementations.
+utils
+    Flow construction, array creation, saving, and loading utilities.
+animate
+    Functions to generate 2-D animations from saved data.
+execution
+    Command-line interface for running full simulations from a config file.
+
+Users typically import from submodules directly instead of importing from
+the top-level package.
 """
