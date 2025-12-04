@@ -201,6 +201,14 @@ class SimulationParameters():
         self.beta = beta
         self.st = st
 
+        if st < 0.05:
+
+            raise ValueError('Enter a Stokes Number greater than 0.05')
+
+        if beta < 0.1 or beta > 3:
+
+            raise ValueError('Enter a Beta value between 0.1 and 3')
+
     def current_time(self, i):
 
         return self.time_array[i]
