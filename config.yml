@@ -11,7 +11,7 @@ boundary_conditions: ['periodic', 'periodic']
 # Enter simulation parameters
 num_particles: 200
 time_step: 0.05
-total_simulation_time: 30
+total_simulation_time: 10
 
 # Enter dimensionless system parameters
 st: 5
